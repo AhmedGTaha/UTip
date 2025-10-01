@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:utip/widgets/person_counter.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,7 +29,9 @@ class UTip extends StatefulWidget {
 
 class _UTipState extends State<UTip> {
   int personCount = 1;
-  //Mthods
+
+  double tipPercentage = 0.0;
+  // Methods
   void incrementPerson() {
     setState(() {
       personCount = personCount + 1;
@@ -99,34 +102,47 @@ class _UTipState extends State<UTip> {
                       ),
                     ),
                   ),
-                  //Split bill section
+                  // Split bill section
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Split', style: theme.textTheme.titleMedium),
-                      Row(
-                        children: [
-                          IconButton(
-                            onPressed: decrementPerson,
-                            icon: Icon(
-                              Icons.remove_circle,
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                          Text(
-                            "$personCount",
-                            style: theme.textTheme.titleMedium,
-                          ),
-                          IconButton(
-                            onPressed: incrementPerson,
-                            icon: Icon(
-                              Icons.add_circle,
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                        ],
+                      PersonCounter(
+                        theme: theme,
+                        personCount: personCount,
+                        onIncrement: incrementPerson,
+                        onDecrement: decrementPerson,
                       ),
                     ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Tip', style: theme.textTheme.titleMedium),
+                      Text('\$0.00', style: theme.textTheme.titleMedium),
+                    ],
+                  ),
+                  // Tip section (now after split)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${(tipPercentage * 100).toStringAsFixed(0)}%',
+                        style: theme.textTheme.titleMedium,
+                      ),
+                    ],
+                  ),
+                  // Slider
+                  Slider(
+                    min: 0,
+                    max: 1,
+                    value: tipPercentage,
+                    label: '${(tipPercentage * 100).toStringAsFixed(0)}%',
+                    onChanged: (double value) {
+                      setState(() {
+                        tipPercentage = value;
+                      });
+                    },
                   ),
                 ],
               ),
