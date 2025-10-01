@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:utip/widgets/bill_amount.dart';
 import 'package:utip/widgets/person_counter.dart';
 import 'package:utip/widgets/tip_slider.dart';
+import 'package:utip/widgets/total_per_person.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,9 +32,13 @@ class UTip extends StatefulWidget {
 
 class _UTipState extends State<UTip> {
   int personCount = 1;
-
   double tipPercentage = 0.0;
-  // Methods
+  double billTotal = 0.0;
+
+  double get tipAmount => billTotal * tipPercentage;
+  double get totalBill => billTotal + tipAmount;
+  double get totalPerPerson => personCount > 0 ? totalBill / personCount : 0.0;
+
   void incrementPerson() {
     setState(() {
       personCount = personCount + 1;
@@ -46,9 +51,9 @@ class _UTipState extends State<UTip> {
     });
   }
 
+  @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
-    //add style to text
     final style = theme.textTheme.titleMedium!.copyWith(
       color: theme.colorScheme.onPrimary,
       fontWeight: FontWeight.bold,
@@ -58,27 +63,10 @@ class _UTipState extends State<UTip> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.inversePrimary,
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Column(
-                children: [
-                  Text('Total per Person', style: style),
-                  Text(
-                    '\$0.00',
-                    style: style.copyWith(
-                      color: theme.colorScheme.onPrimary,
-                      fontSize: theme.textTheme.displaySmall?.fontSize,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          TotalPerPerson(
+            theme: theme,
+            style: style,
+            totalPerPerson: totalPerPerson,
           ),
           //Form
           Padding(
@@ -93,9 +81,11 @@ class _UTipState extends State<UTip> {
                 children: [
                   BillAmount(
                     theme: theme,
-                    billAmount: "100",
+                    billAmount: billTotal.toStringAsFixed(2),
                     onChanged: (String value) {
-                      print(value);
+                      setState(() {
+                        billTotal = double.tryParse(value) ?? 0.0;
+                      });
                     },
                   ),
                   // Split bill section
@@ -111,14 +101,17 @@ class _UTipState extends State<UTip> {
                       ),
                     ],
                   ),
+                  // Tip section (after split)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Tip', style: theme.textTheme.titleMedium),
-                      Text('\$0.00', style: theme.textTheme.titleMedium),
+                      Text(
+                        '\$${tipAmount.toStringAsFixed(2)}',
+                        style: theme.textTheme.titleMedium,
+                      ),
                     ],
                   ),
-                  // Tip section (now after split)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -131,10 +124,10 @@ class _UTipState extends State<UTip> {
                   // Slider
                   TipSlider(
                     tipPercentage: tipPercentage,
-                    onChanged: (double value) => {
+                    onChanged: (double value) {
                       setState(() {
                         tipPercentage = value;
-                      }),
+                      });
                     },
                   ),
                 ],
