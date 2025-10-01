@@ -37,7 +37,7 @@ class _UTipState extends State<UTip> {
 
   void decrementPerson() {
     setState(() {
-      if (personCount > 0) personCount = personCount - 1;
+      if (personCount > 1) personCount = personCount - 1;
     });
   }
 
@@ -107,9 +107,7 @@ class _UTipState extends State<UTip> {
                       Row(
                         children: [
                           IconButton(
-                            onPressed: () {
-                              if (personCount > 1) decrementPerson();
-                            },
+                            onPressed: decrementPerson,
                             icon: Icon(
                               Icons.remove_circle,
                               color: theme.colorScheme.primary,
