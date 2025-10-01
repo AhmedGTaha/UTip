@@ -11,6 +11,7 @@ class TipSlider extends StatelessWidget {
     return Slider(
       min: 0,
       max: 1,
+      divisions: 20,
       value: tipPercentage,
       label: '${(tipPercentage * 100).toStringAsFixed(0)}%',
       onChanged: onChanged,
